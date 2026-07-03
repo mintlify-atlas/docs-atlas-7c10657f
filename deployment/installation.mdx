@@ -1,7 +1,7 @@
 ---
 title: "Install and Run EducaPerú Locally with Laravel"
 sidebarTitle: "Installation"
-description: "Clone, configure, and run the EducaPerú Laravel application locally in six steps. Includes database setup, key generation, and asset compilation."
+description: "Clone, configure, and run the EducaPerú Laravel application locally in six steps — covering key generation, database setup, and asset compilation."
 ---
 
 EducaPerú follows the standard Laravel 12 setup flow and ships with a convenience `composer setup` script that condenses the entire bootstrapping process into a single command. If you prefer full control over each step, a manual path is also documented below. Either way, you will be running the application locally in under five minutes.
@@ -93,5 +93,22 @@ Before you begin, make sure all [server requirements](/deployment/requirements) 
     <Tip>
       If you only need the web server and want to keep things minimal, `php artisan serve` alone is sufficient. You can run queue processing and log watching separately in other terminal tabs as needed.
     </Tip>
+  </Step>
+
+  <Step title="Run the test suite">
+    EducaPerú ships with a `composer test` script that clears the config cache before running PHPUnit, ensuring tests always execute against a clean state.
+
+    ```bash
+    composer test
+    ```
+
+    This script runs the following commands in sequence:
+
+    1. **`php artisan config:clear`** — Flushes any cached configuration to prevent stale values from affecting test results.
+    2. **`php artisan test`** — Executes the full PHPUnit test suite defined in `phpunit.xml`.
+
+    <Note>
+      Tests use the environment defined in your `.env` file by default. Consider creating a `.env.testing` file to point tests at a dedicated SQLite in-memory database so they never touch your development data.
+    </Note>
   </Step>
 </Steps>

@@ -1,18 +1,19 @@
 ---
 title: "Asset Pipeline: Vite, CSS, and Public Files in EducaPerú"
 sidebarTitle: "Assets"
-description: "EducaPerú uses Vite with the Laravel plugin to compile CSS and JavaScript. Static assets like images, fonts, and PDFs live in the public directory."
+description: "EducaPerú compiles CSS and JS through Vite with the Laravel and @tailwindcss/vite plugins. Images, videos, fonts, and PDFs are served from public/."
 ---
 
-EducaPerú's asset pipeline is powered by Vite with the official Laravel plugin. Vite compiles the CSS and JavaScript entry points in `resources/` and outputs versioned files to `public/build/`. Tailwind CSS is currently loaded via CDN directly in the layout template, while static files — images, videos, fonts, and PDFs — are served straight from the `public/` directory without any compilation step.
+EducaPerú's asset pipeline is powered by Vite with the official Laravel plugin. Vite compiles the CSS and JavaScript entry points in `resources/` and outputs versioned files to `public/build/`. Tailwind CSS is installed locally via the `@tailwindcss/vite` plugin and imported directly in `resources/css/app.css` — static files (images, videos, fonts, and PDFs) are served straight from the `public/` directory without any compilation step.
 
 ## Vite Configuration
 
-The project's `vite.config.js` registers the Laravel plugin with both CSS and JS entry points and enables Hot Module Replacement during development:
+The project's `vite.config.js` registers both the Laravel plugin and the `@tailwindcss/vite` plugin, configures the CSS and JS entry points, enables Hot Module Replacement during development, and excludes compiled view files from the file watcher:
 
 ```javascript vite.config.js
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
@@ -20,8 +21,47 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
         }),
+        tailwindcss(),
     ],
+    server: {
+        watch: {
+            ignored: ['**/storage/framework/views/**'],
+        },
+    },
 });
+```
+
+## CSS Entry Point
+
+`resources/css/app.css` imports Tailwind via the `@tailwindcss` package, declares explicit `@source` paths so Tailwind scans all Blade templates and JS files for class names, and sets a custom `--font-sans` theme token:
+
+```css resources/css/app.css
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+```
+
+## JavaScript Entry Point
+
+`resources/js/app.js` is minimal — it imports `bootstrap.js`, which configures Axios with the `X-Requested-With` header required for Laravel to recognise AJAX requests:
+
+```javascript resources/js/app.js
+import './bootstrap';
+```
+
+```javascript resources/js/bootstrap.js
+import axios from 'axios';
+window.axios = axios;
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 ```
 
 ## Build Commands
@@ -69,5 +109,5 @@ Use Laravel's `asset()` helper to generate correct absolute URLs to any file und
 ```
 
 <Note>
-  Tailwind CSS is currently loaded via CDN (`https://cdn.tailwindcss.com`) inside `layouts/app.blade.php` rather than being compiled through Vite. While convenient during development, CDN delivery adds a network round-trip on every page load and prevents purging unused styles. For production, consider installing Tailwind CSS locally (`npm install -D tailwindcss`) and importing it in `resources/css/app.css` so Vite can tree-shake the stylesheet down to only the classes actually used in the project.
+  The master layout (`layouts/app.blade.php`) also loads Tailwind via the `cdn.tailwindcss.com` script tag alongside the compiled `app.css`. During a future production hardening pass, the CDN `<script>` tag can be removed once the compiled stylesheet is confirmed to cover all utility classes in use — removing it will eliminate the extra network round-trip and enable full dead-code elimination through Vite's build step.
 </Note>
