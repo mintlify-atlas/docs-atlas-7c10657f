@@ -1,0 +1,73 @@
+---
+title: "Asset Pipeline: Vite, CSS, and Public Files in EducaPerú"
+sidebarTitle: "Assets"
+description: "EducaPerú uses Vite with the Laravel plugin to compile CSS and JavaScript. Static assets like images, fonts, and PDFs live in the public directory."
+---
+
+EducaPerú's asset pipeline is powered by Vite with the official Laravel plugin. Vite compiles the CSS and JavaScript entry points in `resources/` and outputs versioned files to `public/build/`. Tailwind CSS is currently loaded via CDN directly in the layout template, while static files — images, videos, fonts, and PDFs — are served straight from the `public/` directory without any compilation step.
+
+## Vite Configuration
+
+The project's `vite.config.js` registers the Laravel plugin with both CSS and JS entry points and enables Hot Module Replacement during development:
+
+```javascript vite.config.js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});
+```
+
+## Build Commands
+
+<CodeGroup>
+  ```bash Production
+  npm run build
+  ```
+
+  ```bash Development (HMR)
+  npm run dev
+  ```
+</CodeGroup>
+
+Running `npm run build` compiles and versions the assets into `public/build/` and generates a `manifest.json` used by the `@vite` Blade directive. Running `npm run dev` starts the Vite dev server with Hot Module Replacement so changes to CSS and JS files are reflected in the browser instantly without a full page reload.
+
+## Public Directory Structure
+
+Static assets are organised into purpose-specific subdirectories under `public/`:
+
+```text
+public/
+├── image/
+│   ├── logo1prueba.webp    # Site logo
+│   ├── clases1.webp        # Courses section image
+│   └── desarrollo2.webp    # Web dev section image
+├── videos/
+│   └── 1.webm – 5.webm    # Hero background videos
+├── fonts/
+│   ├── header.woff2        # Custom display font
+│   └── educaperu.woff2     # Custom brand font
+└── pdf/
+    ├── DeysiAlicia.pdf     # Instructor CV
+    └── RoxanaKarina.pdf    # Instructor CV
+```
+
+## Referencing Assets in Blade
+
+Use Laravel's `asset()` helper to generate correct absolute URLs to any file under `public/`. This ensures links remain valid regardless of the application's base URL or subdirectory configuration:
+
+```blade
+<img src="{{ asset('image/logo1prueba.webp') }}" alt="EducaPerú">
+<video src="{{ asset('videos/1.webm') }}" autoplay muted loop></video>
+<a href="{{ asset('pdf/DeysiAlicia.pdf') }}" download>Download CV</a>
+```
+
+<Note>
+  Tailwind CSS is currently loaded via CDN (`https://cdn.tailwindcss.com`) inside `layouts/app.blade.php` rather than being compiled through Vite. While convenient during development, CDN delivery adds a network round-trip on every page load and prevents purging unused styles. For production, consider installing Tailwind CSS locally (`npm install -D tailwindcss`) and importing it in `resources/css/app.css` so Vite can tree-shake the stylesheet down to only the classes actually used in the project.
+</Note>

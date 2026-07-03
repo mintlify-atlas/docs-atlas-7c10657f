@@ -1,0 +1,74 @@
+---
+title: "Server Requirements for Running EducaPerú on Laravel 12"
+sidebarTitle: "Requirements"
+description: "EducaPerú requires PHP 8.2+, Composer, Node.js, and either SQLite or MySQL. Review all server and tooling prerequisites before deploying."
+---
+
+EducaPerú is built on Laravel 12 and requires a modern PHP runtime, a Composer-managed dependency graph, a Node.js toolchain for frontend asset compilation, and a compatible database engine. Make sure every item in this page is satisfied before moving on to [Installation](/deployment/installation).
+
+## Runtime Requirements
+
+<CardGroup cols={2}>
+  <Card title="PHP 8.2 or higher" icon="server">
+    Laravel 12 requires **PHP ^8.2**. PHP 8.3 and 8.4 are also supported. Confirm your version with `php -v`.
+  </Card>
+  <Card title="Composer" icon="box">
+    The PHP dependency manager is required to install Laravel and all its packages. Install the latest stable release from [getcomposer.org](https://getcomposer.org).
+  </Card>
+  <Card title="Node.js and npm" icon="node">
+    Node.js (LTS recommended, v18+) and npm are needed to install frontend dependencies and compile assets with Vite. Confirm with `node -v` and `npm -v`.
+  </Card>
+  <Card title="SQLite, MySQL, or PostgreSQL" icon="database">
+    EducaPerú defaults to **SQLite** for zero-config local development. For production you can switch to MySQL 8+ or PostgreSQL 13+.
+  </Card>
+</CardGroup>
+
+<Tip>
+  SQLite is the default database driver (`DB_CONNECTION=sqlite`). No separate database server is required — Laravel creates the `database/database.sqlite` file automatically on first migration. It is a perfectly valid choice for local development and small-to-medium deployments.
+</Tip>
+
+## PHP Extensions
+
+Laravel 12 depends on the following PHP extensions. Most are enabled by default in standard PHP distributions, but double-check if you are using a minimal or custom build.
+
+| Extension   | Purpose                                              |
+| ----------- | ---------------------------------------------------- |
+| BCMath      | Arbitrary-precision arithmetic used by encryption helpers |
+| Ctype       | Character-type checking                              |
+| cURL        | HTTP client for external API calls                   |
+| DOM         | XML/HTML document parsing                            |
+| Fileinfo    | MIME-type detection for file uploads                 |
+| JSON        | JSON encoding and decoding                           |
+| Mbstring    | Multi-byte string handling for internationalisation  |
+| OpenSSL     | Encryption, hashing, and HTTPS support               |
+| PCRE        | Perl-compatible regular expressions                  |
+| PDO         | Database abstraction layer                           |
+| Tokenizer   | PHP source tokenising used by Artisan                |
+| XML         | XML processing and parsing                           |
+
+Run `php -m` to list all currently loaded extensions on your system.
+
+## Development Tools
+
+The following packages are installed as Composer `require-dev` dependencies. They are not needed in production but are essential for a smooth local development workflow.
+
+| Package | Version | Purpose |
+| ------- | ------- | ------- |
+| `fakerphp/faker` | ^1.23 | Generates realistic seed data for factories and seeders |
+| `laravel/pail` | ^1.2.2 | Real-time log viewer that streams Laravel logs directly in the terminal |
+| `laravel/pint` | ^1.24 | Opinionated PHP code-style fixer built on PHP-CS-Fixer |
+| `laravel/sail` | ^1.41 | Docker-based local development environment for Laravel |
+| `mockery/mockery` | ^1.6 | Test double library used alongside PHPUnit |
+| `nunomaduro/collision` | ^8.6 | Beautiful error reporting for CLI commands and tests |
+| `phpunit/phpunit` | ^11.5.50 | The primary testing framework for all unit and feature tests |
+
+The frontend build chain is powered by these Node devDependencies from `package.json`:
+
+| Package | Version | Purpose |
+| ------- | ------- | ------- |
+| `vite` | ^7.0.7 | Next-generation frontend build tool and dev server |
+| `laravel-vite-plugin` | ^2.0.0 | Seamless Vite integration for Laravel (handles manifest, HMR) |
+| `tailwindcss` | ^4.0.0 | Utility-first CSS framework |
+| `@tailwindcss/vite` | ^4.0.0 | Official Tailwind CSS v4 Vite plugin |
+| `axios` | ^1.11.0 | Promise-based HTTP client used in JavaScript modules |
+| `concurrently` | ^9.0.1 | Runs multiple npm/Composer scripts in parallel (`composer dev`) |

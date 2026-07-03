@@ -1,0 +1,88 @@
+{
+  "projectType": "saas",
+  "projectName": "EducaPerú",
+  "projectDescription": "EducaPerú is a Peruvian tech-education platform built with Laravel that offers professional training courses (Ofimática, C++, Python) and custom web development services for individuals and businesses.",
+  "theme": "almond",
+  "primaryColor": "#fc2c24",
+  "lightColor": "#040404",
+  "darkColor": "#e29d78",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Platform",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "About EducaPerú",
+            "pages": [
+              "about/overview",
+              "about/mission-vision",
+              "about/values"
+            ]
+          },
+          {
+            "group": "Courses",
+            "pages": [
+              "courses/catalog",
+              "courses/ofimatica",
+              "courses/cpp",
+              "courses/python"
+            ]
+          },
+          {
+            "group": "Web Development Service",
+            "pages": [
+              "web-dev/overview",
+              "web-dev/process",
+              "web-dev/contact"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Deployment",
+        "groups": [
+          {
+            "group": "Setup & Configuration",
+            "pages": [
+              "deployment/requirements",
+              "deployment/installation",
+              "deployment/environment"
+            ]
+          },
+          {
+            "group": "Application Structure",
+            "pages": [
+              "deployment/routes",
+              "deployment/views",
+              "deployment/assets"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Professional Ofimática course (Word, Excel, PowerPoint, Google Workspace) with 32 academic hours and 24 practical lessons",
+    "Upcoming C++ and Python programming courses for beginners to advanced learners",
+    "Custom web development service with a 4-phase methodology (Discovery, Proposal, Development, Launch)",
+    "Institutional mission and vision focused on continuing education and professional development in Peru",
+    "Responsive, dark-themed UI built with Tailwind CSS and Blade templates",
+    "Mobile-friendly navigation with animated drawer menu",
+    "Instructor profiles with downloadable CVs for course credibility"
+  ],
+  "publicApiSurface": [
+    "GET / — Welcome / home page",
+    "GET /capacitaciones — Course catalog listing all available and upcoming courses",
+    "GET /capacitaciones/ofimatica — Ofimática course detail page",
+    "GET /nosotros — About Us page (mission, vision, values)",
+    "GET /desarrollo-web — Web development service page with contact form",
+    "GET /login — Student login page"
+  ]
+}

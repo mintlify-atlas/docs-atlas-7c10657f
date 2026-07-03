@@ -1,0 +1,97 @@
+---
+title: "Install and Run EducaPerú Locally with Laravel"
+sidebarTitle: "Installation"
+description: "Clone, configure, and run the EducaPerú Laravel application locally in six steps. Includes database setup, key generation, and asset compilation."
+---
+
+EducaPerú follows the standard Laravel 12 setup flow and ships with a convenience `composer setup` script that condenses the entire bootstrapping process into a single command. If you prefer full control over each step, a manual path is also documented below. Either way, you will be running the application locally in under five minutes.
+
+Before you begin, make sure all [server requirements](/deployment/requirements) are met.
+
+<Steps>
+  <Step title="Clone the repository">
+    Download the source code and move into the project directory.
+
+    ```bash
+    git clone https://github.com/AlexQuintana147/EducaPeru.git
+    cd EducaPeru
+    ```
+  </Step>
+
+  <Step title="Run the setup script">
+    EducaPerú provides a single Composer script that handles the entire bootstrap sequence in one command.
+
+    ```bash
+    composer setup
+    ```
+
+    This script executes the following steps in order:
+
+    1. **`composer install`** — Downloads and installs all PHP dependencies from `composer.lock`.
+    2. **Copy `.env.example` → `.env`** — Creates your local environment file if it does not already exist.
+    3. **`php artisan key:generate`** — Generates a unique 32-character application encryption key and writes it to `APP_KEY` in `.env`.
+    4. **`php artisan migrate --force`** — Runs all pending database migrations against the configured database (SQLite by default).
+    5. **`npm install`** — Installs all Node.js frontend dependencies from `package-lock.json`.
+    6. **`npm run build`** — Compiles and fingerprints CSS and JavaScript assets for production via Vite.
+  </Step>
+
+  <Step title="OR — Manual setup">
+    If you need granular control over each step (for example, to skip migrations or use a different database before migrating), you can run the commands individually instead of using `composer setup`.
+
+    ```bash
+    composer install
+    cp .env.example .env
+    php artisan key:generate
+    php artisan migrate
+    npm install
+    npm run build
+    ```
+
+    This is equivalent to what the `composer setup` script does, but lets you pause, inspect, and adjust between steps.
+  </Step>
+
+  <Step title="Configure your environment">
+    Open the `.env` file in your editor and adjust the key variables for your local setup:
+
+    - **`APP_URL`** — Set to the URL your app will be served on (e.g. `http://localhost:8000`).
+    - **Database credentials** — Only needed if you are switching away from the default SQLite driver.
+    - **Mail settings** — Update `MAIL_MAILER`, `MAIL_HOST`, and related values to use a real mailer instead of the default `log` driver.
+
+    See the full [Environment Variables reference](/deployment/environment) for a description of every available variable.
+  </Step>
+
+  <Step title="Start the development server">
+    Start all development processes simultaneously with a single command:
+
+    ```bash
+    composer dev
+    ```
+
+    This launches four concurrent processes:
+
+    | Process | Command | Purpose |
+    | ------- | ------- | ------- |
+    | **server** | `php artisan serve` | PHP built-in web server at `http://localhost:8000` |
+    | **queue** | `php artisan queue:listen --tries=1 --timeout=0` | Processes queued jobs in real time |
+    | **logs** | `php artisan pail --timeout=0` | Streams Laravel application logs to your terminal |
+    | **vite** | `npm run dev` | Vite HMR dev server for instant CSS/JS updates |
+
+    <Note>
+      `composer dev` uses `npx concurrently` under the hood, so **Node.js must be installed** and available in your `PATH`. If Node.js is missing, the command will fail before the PHP server even starts.
+    </Note>
+  </Step>
+
+  <Step title="Visit the application">
+    Open your browser and navigate to:
+
+    ```
+    http://localhost:8000
+    ```
+
+    You should see the EducaPerú home page served by Laravel. If the page does not load, check the terminal output from `composer dev` for error messages from any of the four processes.
+
+    <Tip>
+      If you only need the web server and want to keep things minimal, `php artisan serve` alone is sufficient. You can run queue processing and log watching separately in other terminal tabs as needed.
+    </Tip>
+  </Step>
+</Steps>

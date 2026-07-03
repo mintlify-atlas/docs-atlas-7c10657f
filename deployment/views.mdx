@@ -1,0 +1,72 @@
+---
+title: "Blade Views and Layout System in EducaPerú"
+sidebarTitle: "Views"
+description: "EducaPerú uses Laravel Blade templates with a single app layout. All pages extend layouts/app and define title and content sections."
+---
+
+EducaPerú uses Laravel's Blade template engine with a single master layout and template inheritance. Every page view extends `layouts/app`, which provides the shared header, navigation, footer, and font/script imports. Child views override named sections — `title` and `content` — to inject page-specific markup without duplicating the surrounding shell.
+
+## View Directory Structure
+
+```text
+resources/views/
+├── layouts/
+│   └── app.blade.php       # Master layout with header & footer
+├── welcome.blade.php        # GET /
+├── capacitaciones.blade.php # GET /capacitaciones
+├── nosotros.blade.php       # GET /nosotros
+├── desarrollo-web.blade.php # GET /desarrollo-web
+└── capacitaciones/
+    └── ofimatica.blade.php  # GET /capacitaciones/ofimatica
+```
+
+## The App Layout
+
+`layouts/app.blade.php` is the single master template that all views build upon. It exposes two named yield points consumed by every child view:
+
+- **`@yield('title')`** — Inserted into the `<title>` tag. Defaults to the application name from `config('app.name')` when not overridden.
+- **`@yield('content')`** — The main body area where each page's unique HTML is rendered.
+
+Beyond the yield points, the layout provides the following structural features:
+
+- **Fixed header** — Contains the EducaPerú logo on the left, a desktop navigation bar in the center, and an **Ingresar** CTA button (`/login`) on the right.
+- **Responsive mobile drawer** — A slide-in side menu triggered by a hamburger icon, visible on small screens and hidden on desktop.
+- **Footer** — Displays the brand description, platform navigation links, course quick-links, and contact information.
+
+<Tip>
+  The layout defines CSS custom properties — `--bg: rgba(20,18,11)` and `--bg-card: rgba(27,25,19)` — for the dark background palette. Use these variables in any new view to stay consistent with the existing theming across all pages.
+</Tip>
+
+## Creating a New View
+
+<Steps>
+  <Step title="Create the Blade file">
+    Add a new file at `resources/views/my-page.blade.php`. Use dot notation for nested paths — for example, a file at `resources/views/capacitaciones/new-course.blade.php` is referenced as `'capacitaciones.new-course'` in the route.
+  </Step>
+  <Step title="Extend the layout and define sections">
+    Open the new file and extend the master layout. Set the `title` section to a descriptive page title and place all page HTML inside the `content` section:
+
+    ```blade resources/views/my-page.blade.php
+    @extends('layouts.app')
+
+    @section('title', 'My Page - EducaPerú')
+
+    @section('content')
+    <div class="relative w-full" style="background-color: var(--bg);">
+      <h1 class="text-white">My Page</h1>
+    </div>
+    @endsection
+    ```
+  </Step>
+  <Step title="Register a route in routes/web.php">
+    Add a matching `GET` route so Laravel knows which URL resolves to the new view:
+
+    ```php routes/web.php
+    Route::get('/my-page', function () {
+        return view('my-page');
+    });
+    ```
+
+    The page is now accessible at `/my-page`. See [Routes](/deployment/routes) for the full route reference.
+  </Step>
+</Steps>

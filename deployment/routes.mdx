@@ -1,0 +1,59 @@
+---
+title: "EducaPerú Web Routes: URL Map and View Bindings"
+sidebarTitle: "Routes"
+description: "All five public web routes defined in routes/web.php — each uses a closure that returns a Blade view. No controllers or middleware are used in the current version."
+---
+
+All routes in EducaPerú are defined in `routes/web.php` using simple closures that return Blade views directly. There are no dedicated controller classes and no API routes in the current version — each URL maps immediately to its corresponding view file.
+
+```php routes/web.php
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/capacitaciones', function () {
+    return view('capacitaciones');
+});
+
+Route::get('/nosotros', function () {
+    return view('nosotros');
+});
+
+Route::get('/desarrollo-web', function () {
+    return view('desarrollo-web');
+});
+
+Route::get('/capacitaciones/ofimatica', function () {
+    return view('capacitaciones.ofimatica');
+});
+```
+
+## Route Reference
+
+| Method | Path | View | Description |
+|--------|------|------|-------------|
+| GET | `/` | `welcome` | Home page with hero and services overview |
+| GET | `/capacitaciones` | `capacitaciones` | Course catalog with all available programs |
+| GET | `/capacitaciones/ofimatica` | `capacitaciones.ofimatica` | Ofimática course detail page |
+| GET | `/nosotros` | `nosotros` | About us: mission, vision, values |
+| GET | `/desarrollo-web` | `desarrollo-web` | Web development service and contact form |
+
+<Note>
+  The `/login` route is referenced in the navbar's **Ingresar** CTA button but is not yet defined in `routes/web.php`. It may be introduced by Laravel Breeze, Laravel Fortify, or a future authentication implementation.
+</Note>
+
+## Adding Routes
+
+To add a new public page, register a `GET` route in `routes/web.php` using the same closure pattern and return the corresponding Blade view:
+
+```php routes/web.php
+Route::get('/new-page', function () {
+    return view('new-page');
+});
+```
+
+Create the matching view file at `resources/views/new-page.blade.php` and the page will be accessible at `/new-page`. See the [Views](/deployment/views) page for how to structure the new template.
